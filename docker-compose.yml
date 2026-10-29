@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: pantrypal-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pantrypal}
+      POSTGRES_USER: ${POSTGRES_USER:-pantrypal}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pantrypal_dev_only}
+    volumes:
+      - pantrypal_pgdata:/var/lib/postgresql/data
+      - ../ppal-db/migrations/001_create_products.sql:/docker-entrypoint-initdb.d/001_create_products.sql:ro
+      - ../ppal-db/seeds/002_seed_demo_products.sql:/docker-entrypoint-initdb.d/002_seed_demo_products.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$${POSTGRES_USER} -d $$${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
+    networks:
+      - pantrypal-local
+
+  api:
+    build:
+      context: ../ppal-api
+      dockerfile: Dockerfile
+    container_name: pantrypal-api
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-pantrypal}:${POSTGRES_PASSWORD:-pantrypal_dev_only}@db:5432/${POSTGRES_DB:-pantrypal}
+      CORS_ORIGINS: http://localhost:4200,http://127.0.0.1:4200,http://localhost:8100,http://localhost,https://localhost,capacitor://localhost
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - pantrypal-local
+
+volumes:
+  pantrypal_pgdata:
+
+networks:
+  pantrypal-local:
+    driver: bridge

@@ -1,39 +1,39 @@
 # ppal-infra
 
-Infraestructura: crea la base de datos y orquesta el sistema completo.
+Local development orchestration for the PantryPal MVP. This repository runs one PostgreSQL database and one REST API; it does not create a microservice per repository.
 
-Forma parte del proyecto **PantryPal** (`ppal`) — Ingeniería para el Desarrollo Móvil (posgrado) · CORHUILA 2026-B.
+## Workspace layout
 
-| | |
-|---|---|
-| Rol | Infraestructura y orquestación |
-| Contenerizado | Sí: se entrega con su `Dockerfile` y orquesta el sistema con Docker Compose. |
-| Gobierno y documentación | [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) |
-| Backlog | GitHub Project `ppal-backlog` |
+Clone the required repositories as sibling directories:
 
-## Ramas
+```
+pantrypal-workspace/
+├── ppal-api/
+├── ppal-db/
+└── ppal-infra/
+```
 
-| Rama | Uso |
-|---|---|
-| `develop` | Integración (rama por defecto) |
-| `qa` | Pruebas |
-| `main` | Producción |
+Run Docker Compose from the ppal-infra directory. The compose file builds the API from ppal-api and mounts the initial database migration and demo seed from ppal-db.
 
-**Todo cambio a `develop`, `qa` o `main` entra por pull request.** Ninguna de las tres admite
-commits directos, force-push ni borrado (tampoco para administradores).
+## Start the local stack
 
-1. Trabajo diario: rama `feat/<tema>` o `fix/<tema>` desde `develop` → PR a `develop`.
-2. Promoción: PR `develop` → `qa` y PR `qa` → `main`.
-3. El PR a `main` necesita la aprobación del docente. La rama de trabajo se borra al fusionar.
+1. Install Docker Desktop and start its engine.
+2. Copy .env.example to .env if custom local values are needed.
+3. Ensure ppal-api and ppal-db have the relevant reviewed feature branches checked out.
+4. Run docker compose up --build -d, docker compose ps, and docker compose logs -f api.
 
-## Repositorios del proyecto
+The API is available on the host at http://localhost:3000. Verify liveness with http://localhost:3000/health and list products at http://localhost:3000/api/products.
 
-| Repositorio | Rol |
-|---|---|
-| [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) | Gobierno único del proyecto |
-| [`ppal-api`](https://github.com/code-corhuila/ppal-api) | Core de negocio (API) |
-| [`ppal-app`](https://github.com/code-corhuila/ppal-app) | Aplicación móvil |
-| [`ppal-portal`](https://github.com/code-corhuila/ppal-portal) | Portal web |
-| [`ppal-db`](https://github.com/code-corhuila/ppal-db) | Migraciones de base de datos |
-| [`ppal-infra`](https://github.com/code-corhuila/ppal-infra) | Infraestructura y orquestación |
-| [`ppal-tools`](https://github.com/code-corhuila/ppal-tools) | Paquete de herramientas |
+The API port is bound to 127.0.0.1 to avoid exposing the unauthenticated demonstration service on all host interfaces. PostgreSQL is not published to the host network.
+
+## Android emulator
+
+The Android emulator reaches the host machine through 10.0.2.2. For a local native debug build, configure the mobile client's development API URL accordingly and allow cleartext traffic only in the debug environment. Do not reuse HTTP or permissive cleartext settings for a production build.
+
+## Database lifecycle
+
+PostgreSQL initialization scripts run only when the data directory is empty. To reset a disposable demo database, run docker compose down -v and then docker compose up --build -d from this directory. The volume deletion command permanently deletes the local database data.
+
+## Security boundary
+
+The MVP has no authentication and is only intended for local development or a controlled demonstration. Do not expose this stack to the public internet or use sensitive personal data. Before any public deployment, add an explicit security review, authentication/authorization decision, TLS, secret management, backups, and environment-specific operational controls.
