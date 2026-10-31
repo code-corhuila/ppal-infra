@@ -1,39 +1,38 @@
 # ppal-infra
 
-Infraestructura: crea la base de datos y orquesta el sistema completo.
+Local infrastructure and orchestration for the PantryPal API and PostgreSQL database, managed with Docker Compose.
 
-Forma parte del proyecto **PantryPal** (`ppal`) — Ingeniería para el Desarrollo Móvil (posgrado) · CORHUILA 2026-B.
+Part of **PantryPal** (`ppal`) — Mobile Development Engineering (graduate program) · CORHUILA 2026-B.
 
 | | |
 |---|---|
-| Rol | Infraestructura y orquestación |
-| Contenerizado | Sí: se entrega con su `Dockerfile` y orquesta el sistema con Docker Compose. |
-| Gobierno y documentación | [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) |
+| Role | Local infrastructure and service orchestration |
+| Containerization | Uses Docker Compose; the API image is built from the `ppal-api` repository's Dockerfile |
+| Project governance and documentation | [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) |
 | Backlog | GitHub Project `ppal-backlog` |
 
-## Ramas
+## Branches
 
-| Rama | Uso |
+| Branch | Purpose |
 |---|---|
-| `develop` | Integración (rama por defecto) |
-| `qa` | Pruebas |
-| `main` | Producción |
+| `develop` | Integration and default branch |
+| `qa` | Quality assurance |
+| `main` | Production/release baseline |
 
-**Todo cambio a `develop`, `qa` o `main` entra por pull request.** Ninguna de las tres admite
-commits directos, force-push ni borrado (tampoco para administradores).
+**All changes to `develop`, `qa`, or `main` must go through a pull request.** Direct commits, force-pushes, and branch deletion are disabled for these branches, including for administrators.
 
-1. Trabajo diario: rama `feat/<tema>` o `fix/<tema>` desde `develop` → PR a `develop`.
-2. Promoción: PR `develop` → `qa` y PR `qa` → `main`.
-3. El PR a `main` necesita la aprobación del docente. La rama de trabajo se borra al fusionar.
+1. Daily work: create a `feat/<topic>` or `fix/<topic>` branch from `develop`, then open a PR to `develop`.
+2. Promotion: open a PR from `develop` to `qa`, then from `qa` to `main`.
+3. A PR to `main` requires instructor approval. Delete a working branch after its PR is merged.
 
-## Repositorios del proyecto
+## Project repositories
 
-| Repositorio | Rol |
+| Repository | Role |
 |---|---|
-| [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) | Gobierno único del proyecto |
-| [`ppal-api`](https://github.com/code-corhuila/ppal-api) | Core de negocio (API) |
-| [`ppal-app`](https://github.com/code-corhuila/ppal-app) | Aplicación móvil |
-| [`ppal-portal`](https://github.com/code-corhuila/ppal-portal) | Portal web |
-| [`ppal-db`](https://github.com/code-corhuila/ppal-db) | Migraciones de base de datos |
-| [`ppal-infra`](https://github.com/code-corhuila/ppal-infra) | Infraestructura y orquestación |
-| [`ppal-tools`](https://github.com/code-corhuila/ppal-tools) | Paquete de herramientas |
+| [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) | Project governance and documentation source of truth |
+| [`ppal-api`](https://github.com/code-corhuila/ppal-api) | Business logic and REST API |
+| [`ppal-app`](https://github.com/code-corhuila/ppal-app) | Mobile application |
+| [`ppal-portal`](https://github.com/code-corhuila/ppal-portal) | Optional web portal |
+| [`ppal-db`](https://github.com/code-corhuila/ppal-db) | PostgreSQL schema and migrations |
+| [`ppal-infra`](https://github.com/code-corhuila/ppal-infra) | Infrastructure and orchestration |
+| [`ppal-tools`](https://github.com/code-corhuila/ppal-tools) | Shared development tooling |
