@@ -1,38 +1,39 @@
 # ppal-infra
 
-Local infrastructure and orchestration for the PantryPal API and PostgreSQL database, managed with Docker Compose.
+Local development orchestration for the PantryPal MVP. This repository runs one PostgreSQL database and one REST API; it does not create a microservice per repository.
 
-Part of **PantryPal** (`ppal`) — Mobile Development Engineering (graduate program) · CORHUILA 2026-B.
+## Workspace layout
 
-| | |
-|---|---|
-| Role | Local infrastructure and service orchestration |
-| Containerization | Uses Docker Compose; the API image is built from the `ppal-api` repository's Dockerfile |
-| Project governance and documentation | [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) |
-| Backlog | GitHub Project `ppal-backlog` |
+Clone the required repositories as sibling directories:
 
-## Branches
+```
+pantrypal-workspace/
+├── ppal-api/
+├── ppal-db/
+└── ppal-infra/
+```
 
-| Branch | Purpose |
-|---|---|
-| `develop` | Integration and default branch |
-| `qa` | Quality assurance |
-| `main` | Production/release baseline |
+Run Docker Compose from the ppal-infra directory. The compose file builds the API from ppal-api and mounts the initial database migration and demo seed from ppal-db.
 
-**All changes to `develop`, `qa`, or `main` must go through a pull request.** Direct commits, force-pushes, and branch deletion are disabled for these branches, including for administrators.
+## Start the local stack
 
-1. Daily work: create a `feat/<topic>` or `fix/<topic>` branch from `develop`, then open a PR to `develop`.
-2. Promotion: open a PR from `develop` to `qa`, then from `qa` to `main`.
-3. A PR to `main` requires instructor approval. Delete a working branch after its PR is merged.
+1. Install Docker Desktop and start its engine.
+2. Copy .env.example to .env if custom local values are needed.
+3. Ensure ppal-api and ppal-db have the relevant reviewed feature branches checked out.
+4. Run docker compose up --build -d, docker compose ps, and docker compose logs -f api.
 
-## Project repositories
+The API is available on the host at http://localhost:3000. Verify liveness with http://localhost:3000/health and list products at http://localhost:3000/api/products.
 
-| Repository | Role |
-|---|---|
-| [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) | Project governance and documentation source of truth |
-| [`ppal-api`](https://github.com/code-corhuila/ppal-api) | Business logic and REST API |
-| [`ppal-app`](https://github.com/code-corhuila/ppal-app) | Mobile application |
-| [`ppal-portal`](https://github.com/code-corhuila/ppal-portal) | Optional web portal |
-| [`ppal-db`](https://github.com/code-corhuila/ppal-db) | PostgreSQL schema and migrations |
-| [`ppal-infra`](https://github.com/code-corhuila/ppal-infra) | Infrastructure and orchestration |
-| [`ppal-tools`](https://github.com/code-corhuila/ppal-tools) | Shared development tooling |
+The API port is bound to 127.0.0.1 to avoid exposing the unauthenticated demonstration service on all host interfaces. PostgreSQL is not published to the host network.
+
+## Android emulator
+
+The Android emulator reaches the host machine through 10.0.2.2. For a local native debug build, configure the mobile client's development API URL accordingly and allow cleartext traffic only in the debug environment. Do not reuse HTTP or permissive cleartext settings for a production build.
+
+## Database lifecycle
+
+PostgreSQL initialization scripts run only when the data directory is empty. To reset a disposable demo database, run docker compose down -v and then docker compose up --build -d from this directory. The volume deletion command permanently deletes the local database data.
+
+## Security boundary
+
+The MVP has no authentication and is only intended for local development or a controlled demonstration. Do not expose this stack to the public internet or use sensitive personal data. Before any public deployment, add an explicit security review, authentication/authorization decision, TLS, secret management, backups, and environment-specific operational controls.
