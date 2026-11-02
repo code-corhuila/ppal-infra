@@ -17,7 +17,7 @@ Run Docker Compose from the ppal-infra directory. The compose file builds the AP
 
 ## Start the local stack
 
-1. Install Docker Desktop and start its engine.
+1. Install Docker Desktop and start its engine..
 2. Copy .env.example to .env if custom local values are needed.
 3. Ensure ppal-api and ppal-db have the relevant reviewed feature branches checked out.
 4. Run docker compose up --build -d, docker compose ps, and docker compose logs -f api.
